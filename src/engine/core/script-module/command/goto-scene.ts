@@ -1,0 +1,17 @@
+import { v4 } from "uuid";
+import { Command, IVisitor } from ".";
+
+export default class GotoSceneCommand extends Command {
+  id: string = v4();
+  name: string = "goto-scene";
+  cnName: string = "场景跳转指令";
+  sceneId: string;
+
+  constructor() {
+    super();
+  }
+
+  accept(visitor: IVisitor): Promise<void> {
+    return visitor.visitGotoSceneCommand(this);
+  }
+}

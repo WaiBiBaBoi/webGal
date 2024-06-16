@@ -1,0 +1,20 @@
+  /* 定义滚动条整体部分的样式 */
+  ::-webkit-scrollbar {
+    width: 6px; /* 滚动条的宽度 */
+    height: 6px;
+  }
+  
+  /* 定义滚动条轨道的样式 */
+  ::-webkit-scrollbar-track {
+    background: #555; /* 轨道的颜色 */
+  }
+  
+  /* 定义滑块的样式 */
+  ::-webkit-scrollbar-thumb {
+    background: #aaa; /* 滑块的颜色 */
+  }
+  
+  /* 当滑块被悬停或激活时的样式 */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #409EFF; /* 滑块被悬停时的颜色 */
+  }
