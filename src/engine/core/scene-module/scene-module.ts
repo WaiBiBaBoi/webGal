@@ -22,6 +22,10 @@ type SpriteContainerState = {
   right?: Sprite;
 };
 
+type BackgroundContainerState = {
+  value?: Sprite;
+};
+
 export type Config = {
   width: number;
   height: number;
@@ -38,6 +42,7 @@ export default class SceneModule {
   spriteContainer: Container = new Container();
   spriteContainerState: SpriteContainerState = {};
   backgroundContainer: Container = new Container();
+  backgroundContainerState: BackgroundContainerState = {};
   imageLayerContainer: Container = new Container();
 
   async initSceneControls(config: Config) {
@@ -94,6 +99,7 @@ export default class SceneModule {
         sprite.anchor.y = 0.5;
         sprite.y = this.pixi.screen.height / 2;
         if (this.spriteContainerState.left) {
+          this.spriteContainerState.left.destroy();
           this.spriteContainer.removeChild(this.spriteContainerState.left);
         }
         this.spriteContainerState.left = sprite;
@@ -103,6 +109,7 @@ export default class SceneModule {
         sprite.x = this.pixi.screen.width / 2;
         sprite.y = this.pixi.screen.height / 2;
         if (this.spriteContainerState.center) {
+          this.spriteContainerState.center.destroy();
           this.spriteContainer.removeChild(this.spriteContainerState.center);
         }
         this.spriteContainerState.center = sprite;
@@ -112,6 +119,7 @@ export default class SceneModule {
         sprite.x = this.pixi.screen.width - sprite.width;
         sprite.y = this.pixi.screen.height / 2;
         if (this.spriteContainerState.right) {
+          this.spriteContainerState.right.destroy();
           this.spriteContainer.removeChild(this.spriteContainerState.right);
         }
         this.spriteContainerState.right = sprite;
@@ -125,18 +133,21 @@ export default class SceneModule {
       case SpriteLocation.Left:
         if (this.spriteContainerState.left) {
           this.spriteContainer.removeChild(this.spriteContainerState.left);
+          this.spriteContainerState.left.destroy();
           this.spriteContainerState.left = undefined;
         }
         break;
       case SpriteLocation.Center:
         if (this.spriteContainerState.center) {
           this.spriteContainer.removeChild(this.spriteContainerState.center);
+          this.spriteContainerState.center.destroy();
           this.spriteContainerState.center = undefined;
         }
         break;
       case SpriteLocation.Right:
         if (this.spriteContainerState.right) {
           this.spriteContainer.removeChild(this.spriteContainerState.right);
+          this.spriteContainerState.right.destroy();
           this.spriteContainerState.right = undefined;
         }
         break;
@@ -147,7 +158,12 @@ export default class SceneModule {
     const bg = new Sprite(image);
     [bg.x, bg.y] = [0, 0];
     [bg.width, bg.height] = [this.pixi.screen.width, this.pixi.screen.height];
-    this.backgroundContainer.removeChild();
+    if (this.backgroundContainerState.value) {
+      this.backgroundContainer.removeChild();
+      this.backgroundContainerState.value.destroy();
+      this.backgroundContainerState.value = undefined;
+    }
     this.backgroundContainer.addChild(bg);
+    this.backgroundContainerState.value = bg;
   }
 }

@@ -10,14 +10,12 @@ export enum SpriteLocation {
 export class SpriteCommand extends Command {
   id: string = v4();
   name: string = "sprite";
-  cnName: string = "精灵指令";
+  remark?: string;
   assetName?: string;
   location: SpriteLocation = SpriteLocation.Left;
 
-  constructor(assetName?: string, location?: SpriteLocation) {
+  constructor() {
     super();
-    this.assetName = assetName;
-    this.location = location ?? SpriteLocation.Left;
   }
 
   accept(visitor: IVisitor): Promise<void> {
@@ -28,12 +26,11 @@ export class SpriteCommand extends Command {
 export class CloseSpriteCommand extends Command {
   id: string = v4();
   name: string = "close-sprite";
-  cnName: string = "关闭精灵指令";
-  location: SpriteLocation;
+  remark?: string;
+  location?: SpriteLocation;
 
-  constructor(location: SpriteLocation) {
+  constructor() {
     super();
-    this.location = location;
   }
 
   accept(visitor: IVisitor): Promise<void> {

@@ -16,3 +16,4 @@ export { Command };
 export { TextCommand };
 export { CloseSpriteCommand, SpriteCommand };
 export { BackgroundCommand };
+export { GotoSceneCommand };

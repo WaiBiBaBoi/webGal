@@ -5,12 +5,11 @@ import { IVisitor } from ".";
 export default class TextCommand extends Command {
   id: string = v4();
   name: string = "text";
-  cnName: string = "文字指令";
-  value: string;
+  remark?: string;
+  value?: string;
 
-  constructor(value: string) {
+  constructor() {
     super();
-    this.value = value;
   }
 
   accept(visitor: IVisitor): Promise<void> {

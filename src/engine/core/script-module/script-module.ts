@@ -73,8 +73,8 @@ export default class ScriptModule implements IVisitor {
       sceneModule.clearTextBox();
       let textIndex = 0;
       const timerId = setInterval(() => {
-        if (textIndex < command.value.length) {
-          sceneModule.displayText(command.value[textIndex]);
+        if (textIndex < command.value!.length) {
+          sceneModule.displayText(command.value![textIndex]);
           textIndex++;
         } else {
           clearInterval(timerId);
@@ -104,7 +104,7 @@ export default class ScriptModule implements IVisitor {
   visitCloseSpriteCommand(command: CloseSpriteCommand): Promise<void> {
     const sceneModule = this.module.sceneModule;
     return new Promise((resolve, _) => {
-      sceneModule.closeSprite(command.location);
+      sceneModule.closeSprite(command.location!);
       resolve();
     });
   }
@@ -124,7 +124,7 @@ export default class ScriptModule implements IVisitor {
 
   visitGotoSceneCommand(command: GotoSceneCommand): Promise<void> {
     return new Promise((resolve, _) => {
-      this.scheduler.goto(command.sceneId);
+      this.scheduler.goto(command.sceneId!);
       resolve();
     });
   }

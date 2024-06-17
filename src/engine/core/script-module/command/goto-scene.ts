@@ -4,8 +4,8 @@ import { Command, IVisitor } from ".";
 export default class GotoSceneCommand extends Command {
   id: string = v4();
   name: string = "goto-scene";
-  cnName: string = "场景跳转指令";
-  sceneId: string;
+  remark?: string;
+  sceneId?: string;
 
   constructor() {
     super();

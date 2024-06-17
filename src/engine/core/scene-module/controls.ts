@@ -35,7 +35,7 @@ export default class SceneControls {
   }
 
   private initAutoButton() {
-    this.autoButton.style.widows = "60px";
+    this.autoButton.style.width = "60px";
     this.autoButton.style.height = "25px";
     this.autoButton.style.display = "flex";
     this.autoButton.style.justifyContent = "center";
