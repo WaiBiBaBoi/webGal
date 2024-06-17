@@ -5,7 +5,7 @@ export default class AssetsManager {
   imageAssets: Map<string, Asset> = new Map();
   spriteAssets: Map<string, Asset> = new Map();
 
-  addImage(file: File) {
+ addImage(file: File) {
     if (this.imageAssets.has(file.name)) return false;
     this.imageAssets.set(file.name, new Asset(file));
     return true;

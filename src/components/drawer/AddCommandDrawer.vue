@@ -20,9 +20,9 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import {TextCommand,CloseSpriteCommand, SpriteCommand,BackgroundCommand} from '../../engine/core/script-module/command/index'
+import {TextCommand,CloseSpriteCommand, SpriteCommand,BackgroundCommand,GotoSceneCommand} from '../../engine/core/script-module/command/index'
 import { useSceneStore } from '../../stores/sceneStores'
-
+import { message } from 'ant-design-vue';
 const open = ref<boolean>(false);
 const SceneStore = useSceneStore()
 interface CommandItem {
@@ -55,6 +55,7 @@ let commands: CommandItem[] = [
 ]
 
 let currentSceneID = ref<string>('')
+
 const afterOpenChange = (bool: boolean) => {
   console.log('open', bool);
 };
@@ -64,8 +65,21 @@ const showDrawer = (id:string) => {
   open.value = true;
 };
 const addCommand = (command:CommandItem) => {
+  if(!currentSceneID.value){
+    message.info('未选择场景')
+    return
+  }
   if(command.command === 'background'){
     SceneStore.addSceneCommand(currentSceneID.value,new BackgroundCommand())
+  }
+  if(command.command === 'sprite'){
+    SceneStore.addSceneCommand(currentSceneID.value,new SpriteCommand())
+  }
+  if(command.command === 'goto-scene'){
+    SceneStore.addSceneCommand(currentSceneID.value,new GotoSceneCommand())
+  }
+  if(command.command === 'text'){
+    SceneStore.addSceneCommand(currentSceneID.value,new TextCommand())
   }
 }
 defineExpose({

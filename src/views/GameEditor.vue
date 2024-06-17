@@ -25,12 +25,12 @@
             <a-col :span="4">
                 <div class="command-list">
                     <div class="command-item" v-for="(item, index) in currentScene.commands" :key="index">
-                        <a-card title="播放背景音乐" style="width: 100%">
+                        <a-card :title="item.name" style="width: 100%">
                             <template #extra>
-                                <a href="#" style="margin-right: 8px;" @click="openSetCommandDrawer">编辑</a>
+                                <a href="#" style="margin-right: 8px;" @click="openSetCommandDrawer(item)">编辑</a>
                                 <a href="#">移除</a>
                             </template>
-                            <p>card content</p>
+                            <p>{{item.remark}}</p>
                         </a-card>
                     </div>
                 </div>
@@ -40,23 +40,29 @@
             </a-col>
         </a-row>
         <add-command-drawer ref="AddCommandDrawerRef"></add-command-drawer>
-        <set-command-drawer ref="SetCommandDrawerRef"></set-command-drawer>
         <scene-drawer ref="SceneDrawerRef" @selectSceneOk="selectSceneOk"></scene-drawer>
         <asset-drawer ref="AssetDrawerRef"></asset-drawer>
+        <background-drawer ref="BackgroundDrawerRef"></background-drawer>
+        <goto-scene-drawer ref="GotoSceneDrawerRef"></goto-scene-drawer>
+
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref,inject } from 'vue'
 import AddCommandDrawer from '../components/drawer/AddCommandDrawer.vue'
-import SetCommandDrawer from '../components/drawer/SetCommandDrawer.vue'
 import SceneDrawer from '../components/drawer/SceneDrawer.vue'
 import AssetDrawer from '../components/drawer/AssetDrawer.vue'
+import BackgroundDrawer from '../components/commandDrawer/BackgroundDrawer.vue'
+import GotoSceneDrawer from '../components/commandDrawer/GotoSceneDrawer.vue'
+
 import {Scene} from '../interface'
 const AddCommandDrawerRef = ref()
-const SetCommandDrawerRef = ref()
 const SceneDrawerRef = ref()
 const AssetDrawerRef = ref()
+
+const BackgroundDrawerRef = ref()
+const GotoSceneDrawerRef = ref()
 const webEngine: any = inject("webEngine");
 console.log(webEngine);
 
@@ -104,9 +110,19 @@ const openDrawer = (drawerType: string) => {
         AssetDrawerRef.value.showDrawer()
     }
 }
+interface Command {
+    name:string
+    sceneid:string
+}
+const openSetCommandDrawer = (command:Command) => {
+    command.sceneid = currentScene.value.id
+    if(command.name === 'background'){
+        BackgroundDrawerRef.value.showDrawer(command)
+    }
 
-const openSetCommandDrawer = () => {
-    SetCommandDrawerRef.value?.showDrawer()
+    if(command.name === 'goto-scene'){
+        GotoSceneDrawerRef.value.showDrawer(command)
+    }
 }
 const selectSceneOk = (scene:Scene) => {
     currentScene.value = scene

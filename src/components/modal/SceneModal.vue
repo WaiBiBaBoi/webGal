@@ -27,7 +27,7 @@ interface SceneType {
 const showModal = (scene: SceneType) => {
     open.value = true;
     console.log(scene);
-    if (scene) {
+    if (scene.id) {
         for (let key in scene) {
             sceneForm.value[key] = scene[key]
         }
@@ -43,7 +43,11 @@ const handleOk = (e: MouseEvent) => {
     if(sceneForm.value.id){
         SceneStore.editScene(sceneForm.value.id,sceneForm.value)
     }else{
-        SceneStore.addScene(new Scene(sceneForm.value.name))
+        let name:string = ''
+        if(sceneForm.value.name){
+            name = sceneForm.value.name
+        }
+        SceneStore.addScene(new Scene(name))
 
     }
     open.value = false;

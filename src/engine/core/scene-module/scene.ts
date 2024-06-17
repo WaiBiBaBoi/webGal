@@ -6,7 +6,12 @@ export class SceneConfig {
 
 export default class Scene {
   id: string = v4();
-  name?: string;
+  name: string;
   remark?: string;
   commands: Command[] = [];
+
+  constructor(name:string) {
+    this.name = name
+
+  }
 }
