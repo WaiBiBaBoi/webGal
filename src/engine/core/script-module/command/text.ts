@@ -5,7 +5,7 @@ import { IVisitor } from ".";
 export default class TextCommand extends Command {
   id: string = v4();
   name: string = "text";
-  cnname:string = '台词演出'
+  cnname: string = "台词演出";
   remark?: string;
   value?: string;
 

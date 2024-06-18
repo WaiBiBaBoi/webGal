@@ -10,8 +10,7 @@ export default class Scene {
   remark?: string;
   commands: Command[] = [];
 
-  constructor(name:string) {
-    this.name = name
-
+  constructor(name: string) {
+    this.name = name;
   }
 }

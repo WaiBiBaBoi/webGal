@@ -10,7 +10,7 @@ export enum SpriteLocation {
 export class SpriteCommand extends Command {
   id: string = v4();
   name: string = "sprite";
-  cnname:string = '立绘'
+  cnname: string = "立绘";
   remark?: string;
   assetName?: string;
   location: SpriteLocation = SpriteLocation.Left;
