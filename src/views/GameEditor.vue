@@ -25,12 +25,15 @@
             <a-col :span="4">
                 <div class="command-list">
                     <div class="command-item" v-for="(item, index) in currentScene.commands" :key="index">
-                        <a-card :title="item.name" style="width: 100%">
+                        <a-card :title="item.cnname" style="width: 100%">
                             <template #extra>
                                 <a href="#" style="margin-right: 8px;" @click="openSetCommandDrawer(item)">编辑</a>
-                                <a href="#">移除</a>
+                                <a-popconfirm title="确认移除该指令?" ok-text="是" cancel-text="否"
+                                    @confirm="confirmDelCommand(item)">
+                                    <a href="#">移除</a>
+                                </a-popconfirm>
                             </template>
-                            <p>{{item.remark}}</p>
+                            <p>{{ item.remark }}</p>
                         </a-card>
                     </div>
                 </div>
@@ -42,28 +45,41 @@
         <add-command-drawer ref="AddCommandDrawerRef"></add-command-drawer>
         <scene-drawer ref="SceneDrawerRef" @selectSceneOk="selectSceneOk"></scene-drawer>
         <asset-drawer ref="AssetDrawerRef"></asset-drawer>
+        <run-game-modal ref="RunGameModalRef"></run-game-modal>
+        <!-- **** -->
         <background-drawer ref="BackgroundDrawerRef"></background-drawer>
         <goto-scene-drawer ref="GotoSceneDrawerRef"></goto-scene-drawer>
-
+        <sprite-drawer ref="SpriteDrawerRef"></sprite-drawer>
+        <text-drawer ref="TextDrawerRef"></text-drawer>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref,inject } from 'vue'
+import { ref, inject } from 'vue'
+import { useSceneStore } from '../stores/sceneStores'
+import { Scene } from '../interface'
+//--导航栏
 import AddCommandDrawer from '../components/drawer/AddCommandDrawer.vue'
 import SceneDrawer from '../components/drawer/SceneDrawer.vue'
 import AssetDrawer from '../components/drawer/AssetDrawer.vue'
-import BackgroundDrawer from '../components/commandDrawer/BackgroundDrawer.vue'
-import GotoSceneDrawer from '../components/commandDrawer/GotoSceneDrawer.vue'
-
-import {Scene} from '../interface'
+import RunGameModal from '../components/modal/RunGameModal.vue'
 const AddCommandDrawerRef = ref()
 const SceneDrawerRef = ref()
 const AssetDrawerRef = ref()
+const RunGameModalRef = ref()
 
+//--指令
+import BackgroundDrawer from '../components/commandDrawer/BackgroundDrawer.vue'
+import GotoSceneDrawer from '../components/commandDrawer/GotoSceneDrawer.vue'
+import SpriteDrawer from '../components/commandDrawer/SpriteDrawer.vue'
+import TextDrawer from '../components/commandDrawer/TextDrawer.vue'
 const BackgroundDrawerRef = ref()
 const GotoSceneDrawerRef = ref()
+const SpriteDrawerRef = ref()
+const TextDrawerRef = ref()
+//--
 const webEngine: any = inject("webEngine");
+const SceneStore = useSceneStore()
 console.log(webEngine);
 
 interface MenuItem {
@@ -88,14 +104,17 @@ const menus: MenuItem[] = [
     {
         text: '配置',
         value: ''
+    },
+    {
+        text: '运行',
+        value: 'run-game-modal'
     }
-
 ]
 
 let currentScene = ref<Scene>({
-    id:'',
-    name:'',
-    commands:[]
+    id: '',
+    name: '',
+    commands: []
 })
 const openDrawer = (drawerType: string) => {
     if (drawerType === 'command-drawer') {
@@ -109,24 +128,68 @@ const openDrawer = (drawerType: string) => {
     if (drawerType === 'asset-drawer') {
         AssetDrawerRef.value.showDrawer()
     }
+
+    if (drawerType === 'run-game-modal') {
+        // RunGameModalRef.value.showModal()
+    }
 }
 interface Command {
-    name:string
-    sceneid:string
+    name: string
+    sceneid: string
 }
-const openSetCommandDrawer = (command:Command) => {
+const openSetCommandDrawer = (command: Command) => {
     command.sceneid = currentScene.value.id
-    if(command.name === 'background'){
+    if (command.name === 'background') {
         BackgroundDrawerRef.value.showDrawer(command)
     }
 
-    if(command.name === 'goto-scene'){
+    if (command.name === 'goto-scene') {
         GotoSceneDrawerRef.value.showDrawer(command)
     }
+
+    if (command.name === 'sprite') {
+        SpriteDrawerRef.value.showDrawer(command)
+    }
+
+    if (command.name === 'text') {
+        TextDrawerRef.value.showDrawer(command)
+    }
 }
-const selectSceneOk = (scene:Scene) => {
+
+const confirmDelCommand = (command: Command) => {
+    SceneStore.delSceneCommand(currentScene.value.id, command)
+}
+
+const selectSceneOk = (scene: Scene) => {
     currentScene.value = scene
 }
+
+const initStage = () => {
+    function getCurrentScreenAspectRatio(): string {
+        // 获取屏幕的宽度和高度
+        const width: number = window.screen.width;
+        const height: number = window.screen.height;
+
+        // 计算显示器的比例
+        const ratio: number = width / height;
+
+        // 返回宽高比，四舍五入到两位小数
+        return ratio.toFixed(2);
+    }
+
+    // 使用该函数获取当前显示器的比例
+    const currentScreenRatio: string = getCurrentScreenAspectRatio();
+
+    // 判断当前显示器的比例
+    if (Math.abs(parseFloat(currentScreenRatio) - 16 / 9) < 0.05) {
+        console.log("当前显示器比例为 16:9");
+    } else if (Math.abs(parseFloat(currentScreenRatio) - 16 / 10) < 0.05) {
+        console.log("当前显示器比例为 16:10");
+    } else {
+        console.log("当前显示器比例未知");
+    }
+}
+initStage()
 </script>
 
 <style lang="less" scoped>
