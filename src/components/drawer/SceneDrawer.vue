@@ -4,7 +4,8 @@
             <a-button @click="openSceneModal">添加</a-button>
         </template>
         <div class="scene-list">
-            <div class="scene-item" v-for="(item, index) in SceneStore.scenes" :key="index">
+            <div class="scene-item" :draggable="true" @dragstart="dragStart(index)" @dragover="dragOver(index,$event)"
+                @drop="drop(index,$event)" @dragend="dragEnd" v-for="(item, index) in SceneStore.scenes" :key="index">
                 <a-card :title="item.name" style="width: 100%">
                     <template #extra>
                         <a href="#" style="margin-right: 8px;" @click="selectSceneOk(item)">选择</a>
@@ -51,6 +52,37 @@ const selectSceneOk = (item: object) => {
     emit('selectSceneOk', item)
     open.value = false
 }
+// 拖拽代码👇
+// 在一些浏览器中，drop事件默认情况下被阻止。为了确保drop事件能够正常触发，你需要在dragover事件的处理函数中调用event.preventDefault()。
+let dragIndex = ref(-1);
+let dropIndex = ref(-1);
+// 开始
+const dragStart = (index: number) => {
+    dragIndex.value = index;
+};
+// 移动
+const dragOver = (index: number,event:DragEvent) => {
+    event.preventDefault();
+    dropIndex.value = index;
+};
+// 放下
+const drop = (index: number,event:DragEvent) => {
+    event.preventDefault();
+    if (dragIndex.value !== index) {
+        const draggedItem = SceneStore.scenes[dragIndex.value];
+        SceneStore.scenes.splice(dragIndex.value, 1);
+        SceneStore.scenes.splice(index, 0, draggedItem);
+    }
+    dragIndex.value = -1;
+    dropIndex.value = -1;
+};
+// 结束
+const dragEnd = () => {
+    dragIndex.value = -1;
+    dropIndex.value = -1;
+};
+// 拖拽代码结束
+
 defineExpose({
     showDrawer
 })

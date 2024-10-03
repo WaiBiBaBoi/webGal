@@ -28,7 +28,7 @@ class Scheduler {
   }
 
   goto(id: string) {
-    const scene = this.scenes?.find((item) => item.name === id);
+    const scene = this.scenes?.find((item) => item.id === id);
     this.currentScene = scene;
     this.index = 0;
   }

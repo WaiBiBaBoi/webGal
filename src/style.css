@@ -6,12 +6,12 @@
   
   /* 定义滚动条轨道的样式 */
   ::-webkit-scrollbar-track {
-    background: #555; /* 轨道的颜色 */
+    background: #aaa; /* 轨道的颜色 */
   }
   
   /* 定义滑块的样式 */
   ::-webkit-scrollbar-thumb {
-    background: #aaa; /* 滑块的颜色 */
+    background: #555; /* 滑块的颜色 */
   }
   
   /* 当滑块被悬停或激活时的样式 */

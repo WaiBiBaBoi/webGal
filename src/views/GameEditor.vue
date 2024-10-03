@@ -24,7 +24,9 @@
             </a-col>
             <a-col :span="4">
                 <div class="command-list">
-                    <div class="command-item" v-for="(item, index) in currentScene.commands" :key="index">
+                    <div class="command-item" :draggable="true" @dragstart="dragStart(index)"
+                        @dragover="dragOver(index, $event)" @drop="drop(index, $event)" @dragend="dragEnd"
+                        v-for="(item, index) in currentScene.commands" :key="index">
                         <a-card :title="item.cnname" style="width: 100%">
                             <template #extra>
                                 <a href="#" style="margin-right: 8px;" @click="openSetCommandDrawer(item)">编辑</a>
@@ -39,7 +41,9 @@
                 </div>
             </a-col>
             <a-col :span="20">
-                3
+                <div style="width: 100%;height: 100%" id="stage-main">
+
+                </div>
             </a-col>
         </a-row>
         <add-command-drawer ref="AddCommandDrawerRef"></add-command-drawer>
@@ -55,9 +59,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject } from 'vue'
+import { ref, onMounted, inject, toRaw } from 'vue'
 import { useSceneStore } from '../stores/sceneStores'
 import { Scene } from '../interface'
+import { Assets } from '../engine/core/assets/assets'
+import SaveZip from '../tool/jszip'
 //--导航栏
 import AddCommandDrawer from '../components/drawer/AddCommandDrawer.vue'
 import SceneDrawer from '../components/drawer/SceneDrawer.vue'
@@ -79,6 +85,7 @@ const SpriteDrawerRef = ref()
 const TextDrawerRef = ref()
 //--
 const webEngine: any = inject("webEngine");
+const AssetsManager: any = inject('AssetsManager')
 const SceneStore = useSceneStore()
 console.log(webEngine);
 
@@ -102,21 +109,30 @@ const menus: MenuItem[] = [
         value: ''
     },
     {
+        text: '变量',
+        value: ''
+    },
+    {
         text: '配置',
         value: ''
     },
     {
         text: '运行',
         value: 'run-game-modal'
-    }
+    },
+    {
+        text: '保存',
+        value: 'ctrl-s'
+    },
 ]
 
 let currentScene = ref<Scene>({
     id: '',
     name: '',
+    remark:'',
     commands: []
 })
-const openDrawer = (drawerType: string) => {
+const openDrawer = async (drawerType: string) => {
     if (drawerType === 'command-drawer') {
         AddCommandDrawerRef.value.showDrawer(currentScene.value.id)
     }
@@ -130,7 +146,26 @@ const openDrawer = (drawerType: string) => {
     }
 
     if (drawerType === 'run-game-modal') {
+        console.log(toRaw(SceneStore.scenes));
+        for (let [key, value,] of AssetsManager.spriteAssets) {
+            await Assets.ImageAssets.load(key, value.blob)
+        }
+        for (let [key, value] of AssetsManager.imageAssets) {
+            await Assets.ImageAssets.load(key, value.blob)
+        }
+        console.log(Assets);
+
+        webEngine.run(toRaw(SceneStore.scenes))
         // RunGameModalRef.value.showModal()
+    }
+
+    if(drawerType === 'ctrl-s'){
+        /**
+         * 参数1：场景列表
+         * 参数2：资产对象
+         * 
+         */
+        SaveZip(SceneStore.scenes,AssetsManager)
     }
 }
 interface Command {
@@ -154,6 +189,8 @@ const openSetCommandDrawer = (command: Command) => {
     if (command.name === 'text') {
         TextDrawerRef.value.showDrawer(command)
     }
+
+    
 }
 
 const confirmDelCommand = (command: Command) => {
@@ -164,7 +201,42 @@ const selectSceneOk = (scene: Scene) => {
     currentScene.value = scene
 }
 
+// 拖拽代码👇
+// 在一些浏览器中，drop事件默认情况下被阻止。为了确保drop事件能够正常触发，你需要在dragover事件的处理函数中调用event.preventDefault()。
+let dragIndex = ref(-1);
+let dropIndex = ref(-1);
+// 开始
+const dragStart = (index: number) => {
+    dragIndex.value = index;
+};
+// 移动
+const dragOver = (index: number, event: DragEvent) => {
+    event.preventDefault();
+    dropIndex.value = index;
+};
+// 放下
+const drop = (index: number, event: DragEvent) => {
+    event.preventDefault();
+    if (dragIndex.value !== index) {
+        const draggedItem = currentScene.value.commands[dragIndex.value];
+        currentScene.value.commands.splice(dragIndex.value, 1);
+        currentScene.value.commands.splice(index, 0, draggedItem);
+    }
+    dragIndex.value = -1;
+    dropIndex.value = -1;
+};
+// 结束
+const dragEnd = () => {
+    dragIndex.value = -1;
+    dropIndex.value = -1;
+};
+// 拖拽代码结束
+
 const initStage = () => {
+    let stageMainElement = document.getElementById('stage-main')
+    let width = stageMainElement?.offsetWidth
+    let height = stageMainElement?.offsetHeight
+    return webEngine.create({ width, height })
     function getCurrentScreenAspectRatio(): string {
         // 获取屏幕的宽度和高度
         const width: number = window.screen.width;
@@ -185,11 +257,17 @@ const initStage = () => {
         console.log("当前显示器比例为 16:9");
     } else if (Math.abs(parseFloat(currentScreenRatio) - 16 / 10) < 0.05) {
         console.log("当前显示器比例为 16:10");
-    } else {
-        console.log("当前显示器比例未知");
+    } else if (Math.abs(parseFloat(currentScreenRatio) - 21 / 9) < 0.05) {
+        console.log("当前显示器比例为 21:9");
     }
+
 }
-initStage()
+onMounted(async () => {
+
+    let stageElement = await initStage()
+    console.log(stageElement);
+    document.getElementById('stage-main')?.append(stageElement)
+})
 </script>
 
 <style lang="less" scoped>
@@ -217,7 +295,7 @@ initStage()
     border-right: 1px solid #eee;
     height: calc(100vh - @headMenuHeight);
     padding: 8px;
-
+    overflow-y: auto;
     .command-item {
         margin-bottom: 8px;
     }

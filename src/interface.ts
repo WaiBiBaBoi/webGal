@@ -1,5 +1,6 @@
 export interface Scene {
     id: string,
-    name: string
+    name: string,
+    remark: string;
     commands:Array<any>
 }

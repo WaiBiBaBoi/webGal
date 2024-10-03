@@ -4,7 +4,7 @@ export default class AssetsManager {
   // public static readonly soundAssets: Map<string, Blob> = new Map();
   imageAssets: Map<string, Asset> = new Map();
   spriteAssets: Map<string, Asset> = new Map();
-
+  
  addImage(file: File) {
     if (this.imageAssets.has(file.name)) return false;
     this.imageAssets.set(file.name, new Asset(file));
@@ -44,7 +44,6 @@ class Asset {
     this.blob = file;
     this.resource = URL.createObjectURL(file);
   }
-
   public clear() {
     URL.revokeObjectURL(this.resource);
   }

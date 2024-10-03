@@ -3,7 +3,7 @@
         <div>
             <a-form :model="command" :layout="'vertical'">
                 <a-form-item label="场景：" name="scene">
-                    <a-select v-model:value="command.assetName" style="width: 100%" >
+                    <a-select v-model:value="command.sceneId" style="width: 100%" >
                         <a-select-option :value="item.id" v-for="(item, index) in SceneStore.scenes"
                             :key="index">{{ item.name }}</a-select-option>
                     </a-select>
